@@ -18,7 +18,8 @@ public class Rule implements Serializable {
     @Enumerated(EnumType.STRING)
     private RuleType type;
 
-    private int value;
+    private double value;
 
+    @ManyToOne
     private Coupon coupon;
 }

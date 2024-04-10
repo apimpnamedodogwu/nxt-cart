@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class MinimumCartItems implements Rule{
+public class MinimumCartValueRule implements Rule{
 
-    private int minimumNumberOfItems;
+    private double minimumValue;
 
     @Override
     public boolean ruleIsValid(Cart cart) {
-        return cart.getItems().size() >= minimumNumberOfItems;
+        return cart.getTotal() >= minimumValue;
     }
 }

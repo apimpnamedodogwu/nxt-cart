@@ -4,78 +4,71 @@ import data.dto.Cart;
 import data.models.Coupon;
 import data.models.Discount;
 import data.models.Rule;
-import data.models.enums.Coupons;
-import data.models.enums.DiscountType;
 import data.repositories.CouponRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import services.cart.CartService;
-import services.discount.DiscountService;
 import services.discount.FixedAmount;
 import services.discount.GreaterDiscount;
 import services.discount.PercentageDiscount;
-import services.rule.MinimumCartItems;
-import services.rule.MinimumCartValue;
+import services.exceptions.CouponRuleException;
+import services.rule.MinimumCartItemsRule;
+import services.rule.MinimumCartValueRule;
 
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class CouponService {
 
     private final CartService cartService;
-    private final DiscountService discountService;
     private final CouponRepository couponRepository;
 
-    public CouponService(CartService cartService, DiscountService discountService, CouponRepository couponRepository) {
-        this.cartService = cartService;
-        this.discountService = discountService;
-        this.couponRepository = couponRepository;
-    }
+    private final FixedAmount fixedAmountDiscountService;
+    private final PercentageDiscount percentageDiscountService;
+    private final GreaterDiscount greaterDiscountService;
 
-    public Cart applyCoupon(String code) {
-        Optional<Coupons> couponOptional = Optional.of(Coupons.valueOf(code));
-        Coupons couponCode = couponOptional.get();
-        Coupon coupon = couponRepository.findByCouponCode(String.valueOf(couponCode));
+
+    public Cart applyCoupon(String couponCode) throws CouponRuleException {
+
+        Optional<Coupon> coupon = couponRepository.findByCouponCode(String.valueOf(couponCode));
         Cart cart = cartService.getCart();
 
-        for (Rule rule : coupon.getRules()) {
-            switch (rule.getType()) {
-                case MIN_CART_ITEMS -> {
-                    if (!new MinimumCartValue(rule.getValue()).ruleIsValid(cart)) {
-                        throw new IllegalArgumentException("Coupon rules not met");
+        if (coupon.isPresent()) {
+            for (Rule rule : coupon.get().getRules()) {
+                switch (rule.getType()) {
+                    case MIN_CART_ITEMS -> {
+                        if (!new MinimumCartValueRule((int) rule.getValue()).ruleIsValid(cart)) {
+                            throw new CouponRuleException("Coupon rules not met");
+                        }
                     }
-                }
-//                break;
-                case MIN_CART_VALUE -> {
-                    if (!new MinimumCartItems((int) rule.getValue()).ruleIsValid(cart)) {
-                        throw new IllegalArgumentException("Coupon rules not met");
-                    }
-                }
-//                break;
 
-                default -> throw new IllegalArgumentException("Blah");
+                    case MIN_CART_VALUE -> {
+                        if (!new MinimumCartItemsRule((int) rule.getValue()).ruleIsValid(cart)) {
+                            throw new CouponRuleException("Coupon rules not met");
+                        }
+                    }
+//                    default -> throw new IllegalArgumentException("Blah");
+                }
             }
 
-
+            Discount discount = coupon.get().getDiscounts().get(0);
+            double total = cartService.calculateTotal(cart);
+            double calculatedDiscount = calculateDiscount(discount, total);
+            cart.setDiscount(calculatedDiscount);
+            cart.setDiscountedTotal(total - calculatedDiscount);
         }
 
-//        Discount discount = coupon.getDiscounts().get(0);
-//        double total = cartService.calculateTotal(cart);
-////        double discountAmount = discount.calculateDiscount(total);
-//        cart.setDiscount(discountAmount);
-//        cart.setDiscountedTotal(total - discountAmount);
-//        return cart;
+        return cart;
+
     }
 
-//    private DiscountService getDiscountService(DiscountType discountType, Discount discount) {
-//        switch (discountType) {
-//            case FIXED:
-//                return new FixedAmount(discount.getValue()); // Use discount value
-//            case PERCENTAGE:
-//                return new PercentageDiscount(discount.getValue()); // Use discount value
-//            case GREATER:
-//                return new GreaterDiscount(discount.getValue(), discount.);
-//            default:
-//                throw new IllegalArgumentException("Unknown discount type");
-//        }
-//    }
+    private double calculateDiscount(Discount discount, double total) {
+        return switch (discount.getDiscountType()) {
+            case FIXED -> fixedAmountDiscountService.calculateDiscount(total);
+            case PERCENTAGE -> percentageDiscountService.calculateDiscount(total);
+            case GREATER -> greaterDiscountService.calculateDiscount(total);
+        };
+    }
+
 }

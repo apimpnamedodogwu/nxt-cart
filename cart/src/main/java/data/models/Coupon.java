@@ -1,5 +1,6 @@
 package data.models;
 
+import data.models.enums.Coupons;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class Coupon implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private String couponCode;
+    private Coupons couponCode;
 
     @OneToMany
     private List<Rule> rules;
