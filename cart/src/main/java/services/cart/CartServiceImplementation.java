@@ -15,6 +15,8 @@ public class CartServiceImplementation implements CartService {
     public Cart getCart() {
         Cart cart = new Cart();
         cart.setItems(defaultValues);
+        double total = calculateTotal(cart);
+        cart.setTotal(total);
         return cart;
     }
 
