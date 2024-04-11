@@ -6,6 +6,7 @@ import nxt.cart.data.dto.CouponResponse;
 import nxt.cart.data.models.Coupon;
 import nxt.cart.data.models.Discount;
 import nxt.cart.data.models.Rule;
+import nxt.cart.data.models.enums.Coupons;
 import nxt.cart.data.repositories.CouponRepository;
 import nxt.cart.services.cart.CartService;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class CouponService {
 
     public CouponResponse applyCoupon(String couponCode) {
 
-        Optional<Coupon> coupon = couponRepository.findByCouponCode(couponCode);
+        Optional<Coupon> coupon = couponRepository.findByCouponCode(Coupons.valueOf(couponCode));
         Cart cart = cartService.getCart();
         CouponResponse couponResponse = new CouponResponse();
 
@@ -47,14 +48,13 @@ public class CouponService {
                 }
             }
 
-            Discount discount = coupon.get().getDiscounts().get(0);
-            double calculatedDiscount = calculateDiscount(discount);
-            cart.setDiscount(calculatedDiscount);
-            cart.setDiscountedTotal(cart.getTotal() - calculatedDiscount);
-
-
-            couponResponse.setDiscountedAmount(cart.getDiscountedTotal());
-            couponResponse.setTotalAdjustedPrice(cart.getDiscount());
+            for (Discount discount: coupon.get().getDiscounts()) {
+                double calculatedDiscount = calculateDiscount(discount);
+                cart.setDiscount(calculatedDiscount);
+                cart.setDiscountedTotal(cart.getTotal() - calculatedDiscount);
+                couponResponse.setDiscountedAmount(cart.getDiscountedTotal());
+                couponResponse.setTotalAdjustedPrice(cart.getDiscount());
+            }
 
         }
 

@@ -19,9 +19,9 @@ public class Coupon implements Serializable {
     @Enumerated(EnumType.STRING)
     private Coupons couponCode;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Rule> rules;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Discount> discounts;
 }
