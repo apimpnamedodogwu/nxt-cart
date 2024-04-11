@@ -1,5 +1,6 @@
 package nxt.cart.cart;
 
+import junit.framework.Assert;
 import nxt.cart.data.dto.Cart;
 import nxt.cart.CartApplication;
 import nxt.cart.services.cart.CartService;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import nxt.cart.services.coupon.CouponService;
 import nxt.cart.services.exceptions.CouponRuleException;
+
+import static junit.framework.TestCase.assertTrue;
 
 @SpringBootTest(classes = CartApplication.class)
 class CartServiceImplementationTest {
@@ -27,12 +30,13 @@ class CartServiceImplementationTest {
     }
 
     @Test
-    public void testThatCouponCanBeApplied() throws CouponRuleException {
-        Cart cart = couponService.applyCoupon("FIXED1O");
+    public void testThatCouponCanBeApplied() {
+        Cart cart = cartService.getCart();
+        double appliedCoupon = couponService.applyCoupon("FIXED10");
         Assertions.assertTrue(cart.getTotal() > 50);
-        Assertions.assertEquals(140, cart.getDiscount(), "That $10 of $150 is $140");
         Assertions.assertTrue(cart.getItems().size() > 1);
-        System.out.println(cart);
-    }
+        Assert.assertEquals(appliedCoupon, 140);
+//        Assertions.assertTrue(cart.getDiscount() == 140);
 
+    }
 }

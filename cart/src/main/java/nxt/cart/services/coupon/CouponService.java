@@ -49,7 +49,7 @@ public class CouponService {
 
         }
 
-        return cart.getDiscountedTotal();
+        return cart.getDiscount();
 
     }
 

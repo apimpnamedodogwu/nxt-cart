@@ -20,7 +20,7 @@ public class CouponController {
 
     @GetMapping("/coupon")
     public double getCouponPrice(@RequestParam String couponCode) throws CouponRuleException {
-        Cart cart = couponService.applyCoupon(couponCode);
-        return cart.getDiscountedTotal();
+        double cart = couponService.applyCoupon(couponCode);
+        return cart;
     }
 }

@@ -26,10 +26,6 @@ public class CouponTest {
         System.out.println(cart);
     }
 
-    @Test
-    public void testThatCouponCanBeApplied() throws CouponRuleException {
-        Cart cart1 = couponService.applyCoupon("FIXED1O");
-        System.out.println(cart1);
-    }
+
 
 }
