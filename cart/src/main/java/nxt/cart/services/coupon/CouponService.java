@@ -2,12 +2,12 @@ package nxt.cart.services.coupon;
 
 import lombok.AllArgsConstructor;
 import nxt.cart.data.dto.Cart;
+import nxt.cart.data.dto.CouponResponse;
 import nxt.cart.data.models.Coupon;
 import nxt.cart.data.models.Discount;
 import nxt.cart.data.models.Rule;
 import nxt.cart.data.repositories.CouponRepository;
 import nxt.cart.services.cart.CartService;
-import nxt.cart.services.exceptions.CouponRuleException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,23 +20,28 @@ public class CouponService {
     private final CouponRepository couponRepository;
 
 
-    public double applyCoupon(String couponCode) {
+    public CouponResponse applyCoupon(String couponCode) {
 
-        Optional<Coupon> coupon = couponRepository.findByCouponCode(String.valueOf(couponCode));
+        Optional<Coupon> coupon = couponRepository.findByCouponCode(couponCode);
         Cart cart = cartService.getCart();
+        CouponResponse couponResponse = new CouponResponse();
 
         if (coupon.isPresent()) {
             for (Rule rule : coupon.get().getRules()) {
                 switch (rule.getType()) {
                     case MIN_CART_ITEMS -> {
                         if (cart.getItems().size() < rule.getValue()) {
-                            return cart.getTotal();
+                            couponResponse.setTotalAdjustedPrice(cart.getTotal());
+                            couponResponse.setDiscountedAmount(cart.getDiscount());
+                            return couponResponse;
                         }
                     }
 
                     case MIN_CART_VALUE -> {
                         if (cart.getTotal() < rule.getValue()) {
-                            return cart.getTotal();
+                            couponResponse.setTotalAdjustedPrice(cart.getTotal());
+                            couponResponse.setDiscountedAmount(cart.getDiscount());
+                            return couponResponse;
                         }
                     }
                 }
@@ -47,9 +52,13 @@ public class CouponService {
             cart.setDiscount(calculatedDiscount);
             cart.setDiscountedTotal(cart.getTotal() - calculatedDiscount);
 
+
+            couponResponse.setDiscountedAmount(cart.getDiscountedTotal());
+            couponResponse.setTotalAdjustedPrice(cart.getDiscount());
+
         }
 
-        return cart.getDiscount();
+        return couponResponse;
 
     }
 
