@@ -68,8 +68,8 @@ public class CouponDataInitializer implements ApplicationRunner {
             percentMinimumValue = ruleRepository.save(percentMinimumValue);
             percentMinimumItems = ruleRepository.save(percentMinimumItems);
 
-            fixedCoupon.getRules().add(percentMinimumValue);
-            fixedCoupon.getRules().add(percentMinimumItems);
+            percentCoupon.getRules().add(percentMinimumValue);
+            percentCoupon.getRules().add(percentMinimumItems);
 
             Discount percentDiscount = new Discount();
             percentDiscount.setDiscountType(DiscountType.PERCENTAGE);
@@ -92,8 +92,8 @@ public class CouponDataInitializer implements ApplicationRunner {
             mixedMinimumValue = ruleRepository.save(mixedMinimumValue);
             mixedMinimumItems = ruleRepository.save(mixedMinimumItems);
 
-            fixedCoupon.getRules().add(mixedMinimumValue);
-            fixedCoupon.getRules().add(mixedMinimumItems);
+            mixedCoupon.getRules().add(mixedMinimumValue);
+            mixedCoupon.getRules().add(mixedMinimumItems);
 
             Discount mixedDiscount = new Discount();
             mixedDiscount.setDiscountType(DiscountType.GREATER);
@@ -107,17 +107,17 @@ public class CouponDataInitializer implements ApplicationRunner {
 
 
             Coupon rejectedCoupon = new Coupon();
-            mixedCoupon.setCouponCode(Coupons.REJECTED10);
+            rejectedCoupon.setCouponCode(Coupons.REJECTED10);
             Rule rejectedMinimumValue = new Rule();
             rejectedMinimumValue.setType(RuleType.MIN_CART_VALUE);
             rejectedMinimumValue.setValue(1000);
-            Rule rejectedMinimumItems = new Rule();
+//            Rule rejectedMinimumItems = new Rule();
 //            rejectedMinimumItems.setType(RuleType.MIN_CART_ITEMS);
 //            rejectedMinimumItems.setValue(3);
             rejectedMinimumValue = ruleRepository.save(rejectedMinimumValue);
 //            rejectedMinimumItems = ruleRepository.save(rejectedMinimumItems);
 
-            fixedCoupon.getRules().add(rejectedMinimumValue);
+            rejectedCoupon.getRules().add(rejectedMinimumValue);
 //            fixedCoupon.getRules().add(rejectedMinimumItems);
 
             Discount rejectedDiscount = new Discount();
