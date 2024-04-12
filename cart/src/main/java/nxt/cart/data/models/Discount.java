@@ -20,9 +20,6 @@ public class Discount implements Serializable {
 
     private double value;
 
-//    @ManyToOne
-//    private Coupon coupon;
-
     private double percentage;
 
     private double fixedAmount;

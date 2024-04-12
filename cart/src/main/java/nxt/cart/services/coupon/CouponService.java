@@ -9,6 +9,8 @@ import nxt.cart.data.models.Rule;
 import nxt.cart.data.models.enums.Coupons;
 import nxt.cart.data.repositories.CouponRepository;
 import nxt.cart.services.cart.CartService;
+import nxt.cart.services.exceptions.CouponNotFoundException;
+import nxt.cart.services.exceptions.CouponRuleException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,7 +23,11 @@ public class CouponService {
     private final CouponRepository couponRepository;
 
 
-    public CouponResponse applyCoupon(String couponCode) {
+    public CouponResponse applyCoupon(String couponCode) throws CouponRuleException, CouponNotFoundException {
+
+        if (!isValidCouponCode(couponCode)) {
+            throw new CouponNotFoundException("Invalid Coupon Code: " + couponCode);
+        }
 
         Optional<Coupon> coupon = couponRepository.findByCouponCode(Coupons.valueOf(couponCode));
         Cart cart = cartService.getCart();
@@ -34,7 +40,7 @@ public class CouponService {
                         if (cart.getItems().size() < rule.getValue()) {
                             couponResponse.setTotalAdjustedPrice(cart.getTotal());
                             couponResponse.setDiscountedAmount(cart.getDiscount());
-                            return couponResponse;
+                            throw new CouponRuleException("Minimum cart items rule not met for this coupon!");
                         }
                     }
 
@@ -42,7 +48,7 @@ public class CouponService {
                         if (cart.getTotal() < rule.getValue()) {
                             couponResponse.setTotalAdjustedPrice(cart.getTotal());
                             couponResponse.setDiscountedAmount(cart.getDiscount());
-                            return couponResponse;
+                            throw new CouponRuleException("Minimum cart value not met for this coupon!");
                         }
                     }
                 }
@@ -50,10 +56,9 @@ public class CouponService {
 
             for (Discount discount: coupon.get().getDiscounts()) {
                 double calculatedDiscount = calculateDiscount(discount);
-                cart.setDiscount(calculatedDiscount);
-                cart.setDiscountedTotal(cart.getTotal() - calculatedDiscount);
-                couponResponse.setDiscountedAmount(cart.getDiscountedTotal());
-                couponResponse.setTotalAdjustedPrice(cart.getDiscount());
+                couponResponse.setDiscountedAmount(cart.getTotal() - calculatedDiscount);
+                cart.setTotal(calculatedDiscount);
+                couponResponse.setTotalAdjustedPrice(cart.getTotal());
             }
 
         }
@@ -82,6 +87,15 @@ public class CouponService {
 
     private double calculatePercentageDiscount(Discount discount) {
         return cartService.getCart().getTotal() - (cartService.getCart().getTotal() * discount.getPercentage() / 100);
+    }
+
+    private boolean isValidCouponCode(String couponCode) {
+        for (Coupons value : Coupons.values()) {
+            if (value.name().equals(couponCode)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

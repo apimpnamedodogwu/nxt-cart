@@ -111,14 +111,10 @@ public class CouponDataInitializer implements ApplicationRunner {
             Rule rejectedMinimumValue = new Rule();
             rejectedMinimumValue.setType(RuleType.MIN_CART_VALUE);
             rejectedMinimumValue.setValue(1000);
-//            Rule rejectedMinimumItems = new Rule();
-//            rejectedMinimumItems.setType(RuleType.MIN_CART_ITEMS);
-//            rejectedMinimumItems.setValue(3);
+
             rejectedMinimumValue = ruleRepository.save(rejectedMinimumValue);
-//            rejectedMinimumItems = ruleRepository.save(rejectedMinimumItems);
 
             rejectedCoupon.getRules().add(rejectedMinimumValue);
-//            fixedCoupon.getRules().add(rejectedMinimumItems);
 
             Discount rejectedDiscount = new Discount();
             rejectedDiscount.setDiscountType(DiscountType.FIXED);

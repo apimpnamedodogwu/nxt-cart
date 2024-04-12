@@ -21,4 +21,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleCouponRuleException(CouponRuleException couponRuleException, WebRequest request) {
         return handleExceptionInternal(couponRuleException, body=couponRuleException.getLocalizedMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
+
+    @ExceptionHandler(CouponNotFoundException.class)
+    public ResponseEntity<Object> handleCouponNotFoundException(CouponNotFoundException couponNotFoundException, WebRequest request) {
+        return handleExceptionInternal(couponNotFoundException, body=couponNotFoundException.getLocalizedMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 }

@@ -31,7 +31,8 @@ public class CartServiceImplementation implements CartService{
             new Item("Product 1", 20.0),
             new Item("Product 2", 50.0),
             new Item("Product 3", 80.0),
-            new Item("Product 4", 200.0)
+            new Item("Product 4", 200.0),
+            new Item("Product 5", 1000.0)
     );
 
 }
