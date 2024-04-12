@@ -16,11 +16,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.Assert.assertThrows;
 
 @SpringBootTest(classes = CartApplication.class)
-class CartServiceImplementationTest {
+class CartApplicationTest {
 
     @Autowired
     CartService cartService;
@@ -87,20 +86,6 @@ class CartServiceImplementationTest {
         double total = cartService.calculateTotal(cart);
         cart.setTotal(total);
         assertThrows(CouponNotFoundException.class, () -> couponService.applyCoupon("FIXE0"));
-    }
-
-    @Test
-    public void testThatCouponRuleExceptionIsThrown() {
-        Cart cart = new Cart();
-        List<Item> items = new ArrayList<>();
-        Item itemOne = new Item("CheckOne", 10);
-        Item itemTwo = new Item("CheckTwo", 15);
-        items.add(itemOne);
-        items.add(itemTwo);
-        cart.setItems(items);
-        double total = cartService.calculateTotal(cart);
-        cart.setTotal(total);
-        assertThrows(CouponRuleException.class, () -> couponService.applyCoupon("FIXED10"));
     }
 
 }

@@ -18,6 +18,7 @@ public class Rule implements Serializable {
     @Enumerated(EnumType.STRING)
     private RuleType type;
 
+    @Column(name = "rule_value")
     private double value;
 
     @ManyToOne

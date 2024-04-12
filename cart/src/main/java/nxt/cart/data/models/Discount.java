@@ -18,6 +18,7 @@ public class Discount implements Serializable {
     @Enumerated(EnumType.STRING)
     private DiscountType discountType;
 
+    @Column(name = "discount_value")
     private double value;
 
     private double percentage;
