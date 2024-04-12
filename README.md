@@ -7,7 +7,7 @@
 - Repository Layer: Interacts with the database to access and manage coupon data (rules, discounts).
 - Database: Stores coupon information, rules, and discount types.
 
-The database design includes the following tables:
+## The database design includes the following tables (In-memory database):
 
 ### Coupon
 ### Rules
